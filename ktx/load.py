@@ -59,6 +59,16 @@ def load(filename):
 		for key,value in info.items():
 			print(key + ':' + str(info_plain[value]))
 			info[key] = info_plain[value]
+		# TODO Add support of metadata
+		#m_byte_size = struct.unpack(c_end+'I',f.read(4))
+		#metadata_p = f.read(m_byte_size)
+		#valuePadding = struct.unpack('',f.read(2))
+		f.read(info['bytesOfKeyValueData'])
+		print(f.tell())
+		imageSize = struct.unpack(c_end + 'I',f.read(4))
+		print('imageSize:' + str(imageSize[0]))
+		imageData = f.read(imageSize[0])
+
 
 # TEST rgba
 load('../images/rgba.ktx')
