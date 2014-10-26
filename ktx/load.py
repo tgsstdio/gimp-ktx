@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 # UInt32 glType = 0
 # UInt32 glTypeSize = 1
@@ -23,6 +23,23 @@
 # Byte[512] ETC compressed texture data
 
 import struct
+import sys
+
+def check_format_2_x(file_id,right_file_id):
+	if bytes(map(ord, file_id)) == right_file_id:
+		return True
+
+def check_format_3_x(file_id,right_file_id):
+	if file_id == right_file_id:
+		return True
+
+def ending_2_x(endians,little_endians):
+	if bytes(map(ord, endians)) == little_endians:
+		return True
+
+def engine_3_x(endians,little_endians):
+	if endians == little_endians:
+		return True
 
 def load(filename):
 	right_file_id = bytes([0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A])
@@ -43,16 +60,24 @@ def load(filename):
 				'bytesOfKeyValueData' : 11}
 	with open(filename, 'rb') as f:
 		file_id = f.read(12)
-		if file_id == right_file_id:
-			print('Is\'s KTX')
-		else : print('It\'s don\'t KTX')
 		endians = f.read(4)
-		if endians == little_endians:
+		if sys.version_info[0] == 2:
+			format = check_format_2_x(file_id,right_file_id)
+			is_little = ending_2_x(endians,little_endians)
+		else :
+			format = check_format_3_x(file_id,right_file_id)
+			is_little = engine_3_x(endians,little_endians)
+		if format:
+			print('It\'s KTX')
+		else : print('It\'s Not KTS')
+
+		if is_little:
 			c_end = '<'
 		else :
 			c_end = '>'
 		info_b = f.read(len(info)*4)
 		info_f = '';
+		print(len(info))
 		for i in range(len(info)):
 			info_f += 'I'
 		info_plain = struct.unpack(c_end + info_f,info_b)
@@ -68,7 +93,6 @@ def load(filename):
 		imageSize = struct.unpack(c_end + 'I',f.read(4))
 		print('imageSize:' + str(imageSize[0]))
 		imageData = f.read(imageSize[0])
-
 
 # TEST rgba
 load('../images/rgba.ktx')
