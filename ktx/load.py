@@ -25,20 +25,12 @@
 import struct
 import sys
 
-def check_format_2_x(file_id,right_file_id):
-	if bytes(map(ord, file_id)) == right_file_id:
+def check_2_x(first,second):
+	if bytes(map(ord, first)) == second:
 		return True
 
-def check_format_3_x(file_id,right_file_id):
-	if file_id == right_file_id:
-		return True
-
-def ending_2_x(endians,little_endians):
-	if bytes(map(ord, endians)) == little_endians:
-		return True
-
-def engine_3_x(endians,little_endians):
-	if endians == little_endians:
+def check_3_x(first,second):
+	if first == second:
 		return True
 
 def load(filename):
@@ -62,14 +54,14 @@ def load(filename):
 		file_id = f.read(12)
 		endians = f.read(4)
 		if sys.version_info[0] == 2:
-			format = check_format_2_x(file_id,right_file_id)
-			is_little = ending_2_x(endians,little_endians)
+			format = check_2_x(file_id,right_file_id)
+			is_little = check_2_x(endians,little_endians)
 		else :
-			format = check_format_3_x(file_id,right_file_id)
-			is_little = engine_3_x(endians,little_endians)
+			format = check_3_x(file_id,right_file_id)
+			is_little = check_3_x(endians,little_endians)
 		if format:
 			print('It\'s KTX')
-		else : print('It\'s Not KTS')
+		else : print('It\'s Not KTX')
 
 		if is_little:
 			c_end = '<'
